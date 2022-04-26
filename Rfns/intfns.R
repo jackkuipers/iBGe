@@ -1,4 +1,53 @@
 
+### These are helper functions for soft unknown interventions
+# this one combines covariance matrices
+
+combinecovs <- function(sigmas, mus, Ns, iis, jjs) {
+  sigma <- matrix(0, length(jjs), length(jjs))
+  mu <- rep(0, length(jjs))
+  N <- 0
+  for (ii in iis) {
+    sigma <- sigma + sigmas[[ii]][jjs, jjs] + Ns[[ii]]*mus[[ii]][jjs]%*%t(mus[[ii]][jjs])
+    mu <- mu + Ns[[ii]]*mus[[ii]][jjs]
+    N <- N + Ns[[ii]]
+  }
+  sigma <- sigma - mu%*%t(mu)/N # mu is not rescaled yet!
+  out <- list()
+  out$sigma <- sigma
+  out$mu <- mu/N
+  out$N <- N
+  return(out)
+}
+
+# this one turns them into statistics needed for the BGe score
+
+BGeaugment <- function(sigma, mu, N, n, am, aw, logedgepmat) {
+  mu0 <- numeric(length(mu))
+  T0scale <- am * (aw - n - 1)/(am + 1)
+  T0 <- diag(T0scale, length(mu), length(mu))
+  TN <- T0 + sigma + ((am * N)/(am + N)) * (mu0 - mu) %*% t(mu0 - mu)
+  awpN <- aw + N
+  constscorefact <- -(N/2) * log(pi) + (1/2) * log(am/(am + N))
+  muN <- (N * mu + am * mu0)/(N + am)
+  SigmaN <- TN/(awpN - n - 1)
+  scoreconstvec <- numeric(length(mu))
+  for (j in (1:length(mu))) {
+    awp <- aw - n + j
+    scoreconstvec[j] <- constscorefact - lgamma(awp/2) + 
+      lgamma((awp + N)/2) + ((awp + j - 1)/2) * log(T0scale)
+  }
+  localparam <- list()
+  localparam$type <- "bge"
+  localparam$TN <- TN
+  localparam$awpN <- awpN
+  localparam$scoreconstvec <- scoreconstvec
+  localparam$DBN <- FALSE
+  localparam$MDAG <- FALSE
+  localparam$logedgepmat <- logedgepmat
+  return(localparam)
+}
+
+
 ### This function gives edges weights between the bounds
 # with both positive and negative signs
 
@@ -84,9 +133,6 @@ compareEGs <- function (estEG, trueEG) {
   missing_edges <- which(diffSkel < 0) # edges in true but not estimated EG
   FN <- length(missing_edges)/2 # count to FNs
   trueEG[missing_edges] <- 0 # remove them from further comparisons
-#  if (sum(EGskel(estEG) != EGskel(trueEG)) > 0){
-#    print("Skeletons should match now!")
-#  }
   # modified graphs have the same skeletons, so now just need to count mismatches
   mismatches <- 1*(estEG != trueEG)
   wrong_order <- sum(EGskel(mismatches))/2 # number of wrongly oriented edges
@@ -143,7 +189,7 @@ consensusEG <- function (posteriors, p_threshold) {
 
 
 ### This function takes the string output of UT-IGSP and turns it into 
-#an adjacency matrix
+# an adjacency matrix
 
 SP_to_DAG <- function(x) {
   if(x == "error"){
