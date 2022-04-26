@@ -164,7 +164,7 @@ am_value <- am_samp
 
 method_vec[2] <- "pf"
 
-for (pf in c(14:0*-1)) {
+for (pf in c(3*(3:-2),-8:-10,-10-1*(1:2)/4)){#c(2*5:0,-5*1:5)){##c(14:0*-1)) {
   method_vec[1] <- "MAP"  
   method_vec[3] <- pf
   
@@ -195,6 +195,8 @@ for (pf in c(14:0*-1)) {
   method_vec[4] <- "wang"
   MAPresult <- compareEGs(bestEG, trueEGwang)
   result_df <- rbind(result_df, data.frame(t(c(method_vec, MAPresult))))
+  
+  print(result_df)
   
 ## Order sample
 
@@ -230,8 +232,7 @@ if (ncol(Imat) > 0) {
   method_vec[4] <- "wang"
   MCMCresult <- compareEGs(MCMCEG, trueEGwang)
   result_df <- rbind(result_df, data.frame(t(c(method_vec, MCMCresult))))
-  
-  print(result_df)
+
 }
 
 
