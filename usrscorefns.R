@@ -1,48 +1,5 @@
 
-### These user defined score functions are for unknown imperfect interventions
-
-combinecovs <- function(sigmas, mus, Ns, iis, jjs) {
-  sigma <- matrix(0, length(jjs), length(jjs))
-  mu <- rep(0, length(jjs))
-  N <- 0
-  for (ii in iis) {
-    sigma <- sigma + sigmas[[ii]][jjs, jjs] + Ns[[ii]]*mus[[ii]][jjs]%*%t(mus[[ii]][jjs])
-    mu <- mu + Ns[[ii]]*mus[[ii]][jjs]
-    N <- N + Ns[[ii]]
-  }
-  sigma <- sigma - mu%*%t(mu)/N # mu is not rescaled yet!
-  out <- list()
-  out$sigma <- sigma
-  out$mu <- mu/N
-  out$N <- N
-  return(out)
-}
-
-BGeaugment <- function(sigma, mu, N, n, am, aw, logedgepmat) {
-  mu0 <- numeric(length(mu))
-  T0scale <- am * (aw - n - 1)/(am + 1)
-  T0 <- diag(T0scale, length(mu), length(mu))
-  TN <- T0 + sigma + ((am * N)/(am + N)) * (mu0 - mu) %*% t(mu0 - mu)
-  awpN <- aw + N
-  constscorefact <- -(N/2) * log(pi) + (1/2) * log(am/(am + N))
-  muN <- (N * mu + am * mu0)/(N + am)
-  SigmaN <- TN/(awpN - n - 1)
-  scoreconstvec <- numeric(length(mu))
-  for (j in (1:length(mu))) {
-    awp <- aw - n + j
-    scoreconstvec[j] <- constscorefact - lgamma(awp/2) + 
-      lgamma((awp + N)/2) + ((awp + j - 1)/2) * log(T0scale)
-  }
-  localparam <- list()
-  localparam$type <- "bge"
-  localparam$TN <- TN
-  localparam$awpN <- awpN
-  localparam$scoreconstvec <- scoreconstvec
-  localparam$DBN <- FALSE
-  localparam$MDAG <- FALSE
-  localparam$logedgepmat <- logedgepmat
-  return(localparam)
-}
+### These user defined score functions are for soft unknown interventions
 
 ### This function returns the objects needed to evaluate the user defined score
 usrscoreparameters <- function(initparam, usrpar = list(Imat = NULL, pctesttype = "bge", am = 1, weightvector = NULL, edgepmat = NULL)){
@@ -60,7 +17,8 @@ usrscoreparameters <- function(initparam, usrpar = list(Imat = NULL, pctesttype 
   if (bgn > 0 && nrow(exps) > 1) {
     initparam <- scoreparameters(scoretype = "bge", data = cbind(Imat,data), weightvector = weightvector, bgnodes = 1:ncol(Imat), bgepar = list(am = am_value),
                                  edgepmat = usrpar$edgepmat)
-    
+    initparam$type <- "usr" # make sure it knows that we have redefined the score
+    initparam$pctesttype <- "bge"
     sigmas <- vector("list", nrow(exps))
     mus <- vector("list", nrow(exps))
     Ns <- vector("list", nrow(exps))
@@ -98,13 +56,15 @@ usrscoreparameters <- function(initparam, usrpar = list(Imat = NULL, pctesttype 
 }
 
 
-
 ### This function evaluates the log score of a node given its parents
 usrDAGcorescore <- function (j, parentnodes, n, param) {
+
   iparents <- parentnodes[which(parentnodes %in% param$bgnodes)]
   
   if (length(iparents) == 0 || nrow(param$exps) < 2) {# use standard BGe score
-    outscore <- BiDAG:::DAGcorescore(j, parentnodes, n, param)
+    localparam <- param
+    localparam$type <- "bge"
+    outscore <- BiDAG:::DAGcorescore(j, parentnodes, n, localparam)
   } else {
     parents <- setdiff(parentnodes, iparents)
     # find the different exp conditions for these parents
