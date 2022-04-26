@@ -39,7 +39,7 @@ results_df <- filter(results_df, FP < 21, gt != "wang")
 
 p100 <- ggplot() + 
   geom_point(data = results_df, aes(x = FP, y = TP, color=method, shape = method),
-             size = 4) + 
+             size = 4, alpha = 0.67) + 
   geom_line(data = results_df, aes(x = FP, y = TP, color=method), linetype = 2) +
   scale_shape_manual(values = c(rep(20, 3), 15, rep(20, 2))) + 
   scale_color_manual(values = c("firebrick3", "forestgreen", "darkkhaki", "darkorange", "dodgerblue", "darkorchid4")) +
