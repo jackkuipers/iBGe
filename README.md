@@ -8,4 +8,4 @@ The file iBGe.R runs simulations for a single setting, seed and network size. Th
 
 The file collateResults.R collates output files from the different runs into the mergedresults directory.
 
-The analysis of the Sachs data is handled in Sachs.R
+The analysis of the Sachs data is handled in sachs.R, while plots are in the figures directory.
