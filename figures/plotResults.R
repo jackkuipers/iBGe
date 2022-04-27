@@ -1,4 +1,4 @@
-for (standardize in c(TRUE, FALSE)) {
+for (standardize in c(TRUE)) {
   
   std_string <- ""
   if (!standardize) {
