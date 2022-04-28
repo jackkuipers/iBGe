@@ -12,7 +12,7 @@ for (method in c("GIES", "IGSP")) {
 
 for (method in c("BiDAG", "CandP", "UT-IGSP")) { 
   
-  dir_name <- paste0("../sachsresults/sachs_", method)
+  dir_name <- paste0("../sachsanalyses/sachsnets/sachs_", method)
   
   load(paste0(dir_name, ".Rdata"))
   
