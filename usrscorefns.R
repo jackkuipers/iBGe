@@ -2,7 +2,7 @@
 ### These user defined score functions are for soft unknown interventions
 
 ### This function returns the objects needed to evaluate the user defined score
-usrscoreparameters <- function(initparam, usrpar = list(Imat = NULL, pctesttype = "bge", am = 1, weightvector = NULL, edgepmat = NULL)){
+usrscoreparameters <- function(initparam, usrpar = list(Imat = NULL, pctesttype = "bge", am = 1, weightvector = NULL, edgepmat = NULL, bgremove = TRUE)){
 
   n <- initparam$n
   Imat <- usrpar$Imat
@@ -19,6 +19,7 @@ usrscoreparameters <- function(initparam, usrpar = list(Imat = NULL, pctesttype 
                                  edgepmat = usrpar$edgepmat)
     initparam$type <- "usr" # make sure it knows that we have redefined the score
     initparam$pctesttype <- "bge"
+    initparam$bgremove <- usrpar$bgremove
     sigmas <- vector("list", nrow(exps))
     mus <- vector("list", nrow(exps))
     Ns <- vector("list", nrow(exps))
