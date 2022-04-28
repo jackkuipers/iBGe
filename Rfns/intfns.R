@@ -40,6 +40,7 @@ BGeaugment <- function(sigma, mu, N, n, am, aw, logedgepmat) {
   localparam$type <- "bge"
   localparam$TN <- TN
   localparam$awpN <- awpN
+  localparam$n <- n
   localparam$scoreconstvec <- scoreconstvec
   localparam$DBN <- FALSE
   localparam$MDAG <- FALSE
