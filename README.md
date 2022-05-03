@@ -18,7 +18,7 @@ The Sachs analyses were run with:
 * BiDAG version 2.0.6
 * Bestie version 0.1.5
 
-While the simulations were run on a cluster with
+While the simulations were run on a cluster with:
 
 * R version 3.6.0
 * BiDAG version 2.0.4
