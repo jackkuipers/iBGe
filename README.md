@@ -12,8 +12,13 @@ The analysis of the Sachs data is handled in sachs.R, while plots are in the fig
 
 ## Session Info
 
-The files were checked with:
+The Sachs analyses were run with:
 
 * R version 4.1.2
 * BiDAG version 2.0.6
 * Bestie version 0.1.5
+
+While the simulations were run on a cluster with
+
+* R version 3.6.0
+* BiDAG version 2.0.4
