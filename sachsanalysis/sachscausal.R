@@ -12,7 +12,7 @@ insertSource("../usrscorefns.R", package = "BiDAG")
 insertSource("../usrparamfns.R", package = "Bestie")
 
 # load causal pipeline taken and adapted from https://github.com/annlia/causalpipe
-source("../Rfns/toyDAGfunctions.R")
+source("../Rfns/toyDAGfunctionsSachs.R")
 
 library(data.table) # for last
 library(DiagrammeR) # for making DAG plot
